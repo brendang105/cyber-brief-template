@@ -1,0 +1,420 @@
+# cyber_brief severity keywords: EXAMPLE / TEMPLATE
+# ---------------------------------------------------------------------------
+# HOW TO USE THIS FILE
+#   1. Copy it to a new file named  severity_keywords.txt  (same folder).
+#   2. Edit your copy: add the software you use to [watch1], and add, remove or
+#      move any terms you like. Keep this example file as the original.
+#
+# One term per line. Lines starting with # are notes.
+# Section names are in [square brackets]. Terms are checked against each
+# story's headline and summary.
+#
+# THE THREE LEVELS
+#   tier 1 = SEVERE   : rare. Extreme alarms, or something important that
+#                       touches software you use (see [rules]).
+#   tier 2 = NOTABLE  : broad net, "worth a look". Anything that might matter.
+#   usual             : business as usual.
+#   A digest is as severe as its most severe story.
+#
+# HOW TERMS MATCH
+#   - Not case sensitive. "zero-day", "zero day" and "Zero_Day" are the same.
+#   - A plain term matches at the start of a word and may keep going:
+#       exploit      also matches exploited, exploiting, exploitation
+#   - =term  matches the whole word only. Use it for short terms that would
+#     otherwise match inside other words:   =RCE   =RAT   =APT   =SSN
+#   - re:pattern  is a regular expression, for things like CVE numbers.
+#
+# WHICH LIST DOES WHAT
+#   [tier1]   extreme alarms. One hit is enough.
+#   [tier2]   important words. Broad on purpose.
+#   [tier3]   weak words. Alone they do nothing.
+#   [watch1]  software you depend on (fill this in with YOUR software).
+#   [watch2]  popular software worth a look (Firefox, Chrome, and others).
+#   [change]  admin-change words (retire, enforce, end of support).
+#
+# The [rules] section at the bottom says how the lists combine.
+# ---------------------------------------------------------------------------
+
+
+[tier1]
+# Extreme alarms only. Keep this list short.
+zero day
+0 day
+0day
+actively exploited
+exploited in the wild
+under active attack
+being exploited
+mass exploitation
+known exploited
+=KEV
+emergency directive
+emergency patch
+patch immediately
+wormable
+zero click
+0 click
+maximum severity
+max severity
+re:CVSS(?: score)?:? ?10(?:\.0)?\b
+
+
+[tier2]
+# Important words. A single hit is NOTABLE. With a [watch1] name it is SEVERE.
+
+# Exploitation and urgency
+in the wild
+exploitation attempts
+weaponized
+public exploit
+exploit code
+out of band
+urgent patch
+patch now
+update now
+unpatched
+no patch
+no fix
+proof of concept
+=PoC
+
+# Severity language
+critical vulnerability
+critical flaw
+critical severity
+critical security
+high severity
+re:CVSS(?: score)?:? ?9(?:\.\d)?\b
+=CVSS
+re:CVE-\d{4}-\d{4,}
+remote code execution
+=RCE
+arbitrary code execution
+code execution
+unauthenticated
+pre auth
+authentication bypass
+auth bypass
+privilege escalation
+root access
+root privilege
+sandbox escape
+no user interaction
+backdoor
+hardcoded credentials
+hard coded password
+default credentials
+command injection
+sql injection
+deserialization
+buffer overflow
+memory corruption
+use after free
+=kernel
+one click
+bypass
+vulnerabilit
+flaw
+security advisory
+patch tuesday
+
+# Breaches and data exposure
+breach
+data breach
+hacked
+compromise
+unauthorized access
+intrusion
+leak
+exposed
+exposure
+stolen
+exfiltrat
+million records
+million users
+million customers
+million people
+millions of
+billion
+hundreds of thousands
+re:\d[\d.,]*\s*(?:million|billion)
+re:\b\d{1,3}(?:,\d{3}){2,}\b
+re:\b\d{3},\d{3}\s+(?:\w+\s+)?(?:people|users|customers|records|accounts|patients|individuals|employees|students)
+social security numbers
+=SSN
+=PII
+credentials leaked
+password dump
+unsecured database
+exposed database
+misconfigured bucket
+leak site
+
+# Ransomware and extortion
+ransomware
+ransom demand
+double extortion
+extortion
+wiper
+
+# Supply chain and certificates
+supply chain
+malicious package
+trojanized
+backdoored
+poisoned update
+compromised update
+compromised maintainer
+typosquat
+signing key
+signing certificate
+code signing
+certificate authority
+rogue certificate
+mis issued
+misissued
+distrust
+root certificate
+=PKI
+build system compromise
+
+# Government and nation-state
+nation state
+state sponsored
+=APT
+espionage
+joint advisory
+=CISA
+=NSA
+FBI warns
+
+# Threat actors and malware
+botnet
+mirai
+infostealer
+stealer
+spyware
+stalkerware
+pegasus
+rootkit
+cryptojacking
+=DDoS
+lazarus
+salt typhoon
+volt typhoon
+sandworm
+apt28
+apt29
+cozy bear
+fancy bear
+scattered spider
+shinyhunters
+lockbit
+alphv
+blackcat
+=clop
+akira
+black basta
+qilin
+=conti
+revil
+
+# Identity and access
+mfa bypass
+=SSO
+oauth
+token theft
+session hijack
+api key
+secrets exposed
+adversary in the middle
+=AiTM
+sim swap
+passkey
+
+# Critical infrastructure
+critical infrastructure
+=SCADA
+=ICS
+industrial control
+power grid
+water treatment
+pipeline
+hospital
+healthcare
+airline
+bank
+
+# AI-specific
+prompt injection
+jailbreak
+model poisoning
+malicious model
+
+# Scale words
+infect
+widespread
+worldwide
+
+
+[tier3]
+# WEAK words. Alone they do nothing. They only count when a watched name
+# ([watch1] or [watch2]) appears in the same story.
+attack
+outage
+shutdown
+disrupt
+steal
+=bug
+security issue
+security update
+security fix
+security patch
+patch
+phishing
+malware
+trojan
+ai agent
+threat actor
+dark web
+scam
+
+
+[watch1]
+# YOUR most important software and services. Put one per line, with no #.
+# Until you add some, the "pairs with watch1" rules below do nothing.
+# See [rules] for what pairing with these does. Examples to copy:
+#   ubuntu
+#   synology
+#   proxmox
+#   =Entra
+#   microsoft 365
+#   fortigate
+
+
+[watch2]
+# Popular software worth a look. Move anything you depend on up to [watch1].
+microsoft
+windows
+active directory
+=entra
+azure
+intune
+microsoft 365
+=M365
+sharepoint
+exchange server
+exchange online
+outlook
+microsoft teams
+defender
+powershell
+firefox
+mozilla
+chrome
+chromium
+google
+android
+apple
+=iOS
+macos
+safari
+cisco
+fortinet
+fortigate
+palo alto
+pan os
+ivanti
+citrix
+netscaler
+sonicwall
+=F5
+vmware
+esxi
+vcenter
+juniper
+check point
+atlassian
+confluence
+jenkins
+gitlab
+github
+oracle
+=SAP
+wordpress
+magento
+shopify
+woocommerce
+apache
+log4j
+openssl
+openssh
+linux
+sudo
+glibc
+curl
+php
+zoom
+okta
+cloudflare
+=AWS
+amazon web services
+salesforce
+snowflake
+lastpass
+1password
+bitwarden
+=VPN
+firewall
+router
+edge device
+npm
+pypi
+docker
+kubernetes
+slack
+dropbox
+
+
+[change]
+# Admin-change words, for Microsoft admin news: retirements, enforcement,
+# new requirements. See [rules].
+deprecat
+retire
+retirement
+end of support
+end of life
+=EOL
+breaking change
+will be required
+now required
+mandatory
+enforce
+enforcement
+rolling out
+rollout
+policy change
+license change
+licensing change
+pricing change
+admin center
+message center
+security defaults
+legacy authentication
+basic authentication
+
+
+[rules]
+# How the lists combine. Format:   level: part + part
+#   level  = severe or notable
+#   part   = a list name, or "2x listname" for two different terms from it
+#   "+"    = all parts must be present in the same story
+# The most severe rule that matches wins. Delete a line to turn it off.
+
+severe: tier1
+severe: tier2 + watch1
+severe: tier3 + watch1
+
+notable: tier2
+notable: tier3 + watch2
+notable: change + watch1

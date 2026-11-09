@@ -1,0 +1,7 @@
+.env
+news.db
+run.log
+__pycache__/
+logos/
+.venv*/
+state/

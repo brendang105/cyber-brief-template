@@ -1,0 +1,32 @@
+# Messages for the notification ping. One message per line.
+# The bot picks one at random for the digest's level and puts it after
+# "NEW DIGEST:". Lines starting with # are notes. Edit freely.
+#
+# Optional placeholders (filled in from the top story):
+#   {headline}   {source}   {why}
+# For notable and severe digests the bot also adds the top story's headline
+# and the words that flagged it, so you do not need placeholders.
+
+[severe]
+🚨 Severe: this digest contains a high-priority security story. Review it now.
+🚨 High severity. A story in this digest likely needs action today.
+🚨 Urgent security news. Read the flagged story first.
+🚨 Critical item detected. Check whether it affects your systems.
+🚨 Severe alert. A flagged story matches your watch list or an active threat.
+
+[notable]
+👀 Something in here is worth your attention.
+👀 A few stories made the interesting pile.
+👀 Moderately concerning.
+👀 One of these might be your problem later.
+👀 Tier two: slightly alarming, mildly urgent.
+👀 The bot found something.
+👀 Worth a read.
+👀 Your future self would like you to skim this one.
+
+[usual]
+☕ No significant security news in this digest.
+☕ Routine digest. Nothing flagged.
+☕ New digest posted. No high-priority items.
+☕ Nothing urgent in this digest.
+☕ Standard update. No alerts.

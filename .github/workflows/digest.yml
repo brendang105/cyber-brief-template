@@ -1,0 +1,101 @@
+name: Cyber news digest
+
+on:
+  schedule:
+    # GitHub schedules use UTC. 8:55 AM and 4:55 PM in Denver are 14:55/15:55 UTC
+    # and 22:55/23:55 UTC depending on daylight saving time, so the workflow
+    # starts at all four times and the "Check local time" step below keeps only
+    # the runs that land near 8:55 AM or 4:55 PM Denver time.
+    - cron: "55 14,15,22,23 * * *"
+  workflow_dispatch: {}   # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write         # needed to save the "seen links" file to the state branch
+
+concurrency:
+  group: cyber-brief-digest
+  cancel-in-progress: false
+
+env:
+  # Change time zone here
+  TIMEZONE: America/Denver
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check local time
+        id: gate
+        run: |
+          # Minutes since midnight, local time. Allowed windows leave room for
+          # GitHub starting a few minutes late: 8:40-9:20 AM and 4:40-5:20 PM.
+          mins=$(( 10#$(TZ="$TIMEZONE" date +%H) * 60 + 10#$(TZ="$TIMEZONE" date +%M) ))
+          echo "Local time in $TIMEZONE: $(TZ="$TIMEZONE" date +%H:%M) ($mins minutes after midnight)"
+          if [ "${{ github.event_name }}" != "schedule" ] \
+             || { [ "$mins" -ge 520 ] && [ "$mins" -le 560 ]; } \
+             || { [ "$mins" -ge 1000 ] && [ "$mins" -le 1040 ]; }; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Not a digest hour, skipping."
+          fi
+
+      - name: Check out code
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Load saved state (seen links)
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          mkdir state
+          cd state
+          git init -q
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          if git fetch -q --depth 1 origin state 2>/dev/null; then
+            git checkout -q -b state FETCH_HEAD
+            echo "Loaded existing state branch."
+          else
+            git checkout -q --orphan state
+            echo "No state branch yet; starting fresh."
+          fi
+
+      - name: Send digest
+        if: steps.gate.outputs.run == 'true'
+        env:
+          NEWS_DB_PATH: state/news.db
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_FORUM: "true"          # set to "false" for a regular text channel
+          DISCORD_NOTIFY_ON_EMPTY: "false"
+          DISCORD_TAG_IDS: ${{ secrets.DISCORD_TAG_IDS }}
+          DISCORD_PING_USER_IDS: ${{ secrets.DISCORD_PING_USER_IDS }}
+          DISCORD_NOTIFY_WEBHOOK_URL: ${{ secrets.DISCORD_NOTIFY_WEBHOOK_URL }}
+          DISCORD_NOTIFY_ROLE_ID: ${{ secrets.DISCORD_NOTIFY_ROLE_ID }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+        run: python news_updater.py
+
+      - name: Save state (seen links)
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          cd state
+          git add news.db
+          if git diff --cached --quiet; then
+            echo "Nothing new to save."
+          else
+            git -c user.name="github-actions[bot]" \
+                -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                commit -q -m "Update seen links"
+            git push -q origin state
+            echo "Saved state."
+          fi
